@@ -16,11 +16,11 @@ A modern translation application built with Python and Tkinter that supports:
 - ✨ Modern UI design
 
 ## Requirements 
-python
-pip install googletrans==3.1.0a0
-pip install SpeechRecognition
-pip install pyttsx3
-pip install pyaudio
+- python
+- pip install googletrans==3.1.0a0
+- pip install SpeechRecognition
+- pip install pyttsx3
+- pip install pyaudio
 
 ## Usage
 Run the application:
