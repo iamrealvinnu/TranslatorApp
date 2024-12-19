@@ -276,6 +276,69 @@ class TranslatorApp:
         for btn in [self.voice_input_btn, self.tts_btn]:
             self._add_hover_effect(btn)
 
+        # Add new features frame
+        features_frame = tk.Frame(container, bg=self.colors['bg_primary'])
+        features_frame.pack(fill=tk.X, pady=5)
+        
+        # Auto-Language Detection Toggle
+        self.auto_detect_var = tk.BooleanVar(value=True)
+        self.auto_detect_btn = tk.Checkbutton(
+            features_frame,
+            text="🔄 Auto Detect",
+            variable=self.auto_detect_var,
+            command=self.toggle_auto_detect,
+            bg=self.colors['bg_primary'],
+            fg=self.colors['text_light'],
+            selectcolor=self.colors['bg_secondary'],
+            activebackground=self.colors['bg_primary'],
+            font=("Montserrat", 10)
+        )
+        self.auto_detect_btn.pack(side=tk.LEFT, padx=5)
+        
+        # Always on Top Toggle
+        self.always_on_top_var = tk.BooleanVar(value=False)
+        self.always_on_top_btn = tk.Checkbutton(
+            features_frame,
+            text="📌 Always on Top",
+            variable=self.always_on_top_var,
+            command=self.toggle_always_on_top,
+            bg=self.colors['bg_primary'],
+            fg=self.colors['text_light'],
+            selectcolor=self.colors['bg_secondary'],
+            activebackground=self.colors['bg_primary'],
+            font=("Montserrat", 10)
+        )
+        self.always_on_top_btn.pack(side=tk.LEFT, padx=5)
+        
+        # Mini Mode Toggle
+        self.mini_mode_btn = tk.Button(
+            features_frame,
+            text="🔍 Mini Mode",
+            command=self.toggle_mini_mode,
+            bg=self.colors['bg_secondary'],
+            fg=self.colors['accent_2'],
+            font=("Montserrat", 10),
+            relief=tk.FLAT
+        )
+        self.mini_mode_btn.pack(side=tk.RIGHT, padx=5)
+        
+        # Pronunciation Guide Button
+        self.pronun_btn = tk.Button(
+            features_frame,
+            text="🗣️ Pronunciation",
+            command=self.show_pronunciation,
+            bg=self.colors['bg_secondary'],
+            fg=self.colors['accent_2'],
+            font=("Montserrat", 10),
+            relief=tk.FLAT
+        )
+        self.pronun_btn.pack(side=tk.RIGHT, padx=5)
+        
+        # Add keyboard shortcuts
+        self.root.bind('<Control-m>', lambda e: self.toggle_mini_mode())
+        self.root.bind('<Control-t>', lambda e: self.toggle_always_on_top())
+        self.root.bind('<Control-p>', lambda e: self.show_pronunciation())
+        
     def _add_hover_effect(self, button, is_translate_btn=False):
         """Add hover effect to buttons"""
         if is_translate_btn:
@@ -453,9 +516,41 @@ class TranslatorApp:
 
     def apply_theme(self):
         """Apply current theme to all widgets"""
+        # Update root and all main frames
         self.root.configure(bg=self.colors['bg_primary'])
-        # Update all widgets with new colors
-        # ... (update all widgets with new theme colors)
+        for widget in self.root.winfo_children():
+            if isinstance(widget, tk.Frame):
+                widget.configure(bg=self.colors['bg_primary'])
+                for child in widget.winfo_children():
+                    if isinstance(child, tk.Frame):
+                        child.configure(bg=self.colors['bg_primary'])
+                    elif isinstance(child, tk.Label):
+                        child.configure(
+                            bg=self.colors['bg_primary'],
+                            fg=self.colors['text_light']
+                        )
+                    elif isinstance(child, tk.Button):
+                        if child != self.translate_btn:
+                            child.configure(
+                                bg=self.colors['bg_secondary'],
+                                fg=self.colors['accent_2']
+                            )
+                    elif isinstance(child, scrolledtext.ScrolledText):
+                        child.configure(
+                            bg=self.colors['bg_secondary'],
+                            fg=self.colors['text_light'],
+                            insertbackground=self.colors['text_light']
+                        )
+
+        # Update specific widgets
+        self.title_label.configure(
+            bg=self.colors['bg_primary'],
+            fg=self.colors['accent_2']
+        )
+        self.subtitle_label.configure(
+            bg=self.colors['bg_primary'],
+            fg=self.colors['accent']
+        )
 
     def play_sound(self, action):
         """Play sound effects"""
@@ -540,6 +635,107 @@ class TranslatorApp:
                     self.root.after(0, self.tts_btn.config, {"state": tk.NORMAL})
             
             threading.Thread(target=speak).start()
+
+    def toggle_auto_detect(self):
+        """Toggle automatic language detection"""
+        if self.auto_detect_var.get():
+            self.source_lang_var.set("Auto-Detect")
+            self.detected_lang_label.pack(side=tk.LEFT)
+        else:
+            self.detected_lang_label.pack_forget()
+            
+    def toggle_always_on_top(self):
+        """Toggle always on top mode"""
+        self.root.attributes('-topmost', self.always_on_top_var.get())
+        
+    def toggle_mini_mode(self):
+        """Toggle mini mode for quick translations"""
+        if hasattr(self, 'is_mini_mode') and self.is_mini_mode:
+            # Restore normal mode
+            self.root.geometry(self.original_geometry)
+            self.title_frame.pack(fill=tk.X, pady=(0, 20))
+            self.features_frame.pack(fill=tk.X, pady=5)
+            self.is_mini_mode = False
+        else:
+            # Switch to mini mode
+            self.original_geometry = self.root.geometry()
+            mini_width = 400
+            mini_height = 200
+            screen_width = self.root.winfo_screenwidth()
+            screen_height = self.root.winfo_screenheight()
+            x = screen_width - mini_width - 10
+            y = screen_height - mini_height - 40
+            self.root.geometry(f"{mini_width}x{mini_height}+{x}+{y}")
+            self.title_frame.pack_forget()
+            self.features_frame.pack_forget()
+            self.is_mini_mode = True
+            
+    def show_pronunciation(self):
+        """Show pronunciation guide for translated text"""
+        text = self.target_text.get("2.0", tk.END).strip()
+        if not text:
+            return
+            
+        popup = tk.Toplevel(self.root)
+        popup.title("Pronunciation Guide")
+        popup.geometry("300x200")
+        popup.configure(bg=self.colors['bg_primary'])
+        
+        # Add phonetic pronunciation (simplified example)
+        phonetic_text = text.lower().replace('th', 'ð').replace('ch', 'tʃ')
+        
+        label = tk.Label(popup,
+                        text="Phonetic Pronunciation:",
+                        font=("Montserrat", 12),
+                        bg=self.colors['bg_primary'],
+                        fg=self.colors['text_light'])
+        label.pack(pady=10)
+        
+        pronun_text = scrolledtext.ScrolledText(
+            popup,
+            wrap=tk.WORD,
+            width=30,
+            height=5,
+            font=("Poppins", 12),
+            bg=self.colors['bg_secondary'],
+            fg=self.colors['text_light']
+        )
+        pronun_text.pack(padx=10, pady=5)
+        pronun_text.insert("1.0", phonetic_text)
+        pronun_text.configure(state='disabled')
+        
+        # Add syllable breakdown
+        syllables = self._break_into_syllables(text)
+        
+        tk.Label(popup,
+                text="Syllable Breakdown:",
+                font=("Montserrat", 12),
+                bg=self.colors['bg_primary'],
+                fg=self.colors['text_light']).pack(pady=5)
+                
+        tk.Label(popup,
+                text=syllables,
+                font=("Poppins", 12),
+                bg=self.colors['bg_primary'],
+                fg=self.colors['accent_2']).pack()
+                
+    def _break_into_syllables(self, text):
+        """Simple syllable breakdown (example implementation)"""
+        # This is a simplified version - you might want to use a proper NLP library
+        vowels = 'aeiouAEIOU'
+        syllables = []
+        current = ""
+        
+        for char in text:
+            current += char
+            if char in vowels:
+                syllables.append(current)
+                current = ""
+                
+        if current:
+            syllables.append(current)
+            
+        return " • ".join(syllables)
 
 def main():
     root = tk.Tk()
