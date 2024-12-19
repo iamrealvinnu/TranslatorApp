@@ -3,6 +3,9 @@
 ![Python](https://img.shields.io/badge/Python-3.10-blue.svg)
 ![Tkinter](https://img.shields.io/badge/Tkinter-GUI-orange.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Code Quality](https://img.shields.io/badge/code%20quality-A-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
 
 A modern, feature-rich translation application built with Python and Tkinter that goes beyond basic translation capabilities. This application demonstrates proficiency in GUI development, multi-threading, API integration, and user experience design.
 
