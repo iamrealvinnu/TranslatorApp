@@ -99,15 +99,6 @@ pip install -r requirements.txt
 python translatorApp.py
 ```
 
-## 📝 About
-A feature-rich translation tool that combines modern UI design with powerful translation capabilities. Features voice input/output, smart language detection, and a mini mode for quick translations. Perfect for students, professionals, and anyone needing quick, accurate translations.
-
-## 🏷️ Topics
-python translation-tool speech-recognition gui-application tkinter voice-input text-to-speech language-detection dark-theme mini-mode
-
-## 📄 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 🌟 Features in Detail
 
 ### Voice Integration
