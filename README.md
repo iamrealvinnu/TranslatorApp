@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Universal Translator App
 
 A modern translation application built with Python and Tkinter that supports:
@@ -27,3 +28,6 @@ Run the application:
 ## License
 MIT License
 
+=======
+# TranslatorApp
+>>>>>>> ca6c52e237f87da97a1fe25f14826b516dafd1ed
